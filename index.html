@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>给你的心动告白 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 爱心背景动画 */
+        .hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .message {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .message p {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-yes {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(245, 87, 108, 0.6);
+        }
+
+        .btn-no {
+            background: #f0f0f0;
+            color: #666;
+            position: relative;
+        }
+
+        /* 拒绝按钮逃跑效果 */
+        .btn-no:hover {
+            animation: runAway 0.5s ease;
+        }
+
+        @keyframes runAway {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(50px, -30px); }
+            50% { transform: translate(-30px, 20px); }
+            75% { transform: translate(20px, -10px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-page.active {
+            display: flex;
+        }
+
+        .big-heart {
+            font-size: 100px;
+            animation: heartbeat 1.5s infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .result-text {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .result-sub {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 101;
+        }
+
+        .typing {
+            border-right: 2px solid #e74c3c;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: #e74c3c; }
+        }
+
+        /* 音乐按钮 */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-btn.rotating {
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 照片墙 */
+        .photo-wall {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #ffd1ff 0%, #fad0c4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .photo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* 倒计时 */
+        .countdown {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: white;
+        }
+
+        .countdown-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 380px) {
+            .card {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .btn {
+                padding: 12px 25px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop>
+        <source src="https://music.163.com/song/media/outer/url?id=25706282.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 音乐控制按钮 -->
+    <div class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵</div>
+
+    <!-- 飘落爱心背景 -->
+    <div class="hearts" id="hearts"></div>
+
+    <!-- 主页面 -->
+    <div class="container" id="mainPage">
+        <div class="card">
+            <div class="avatar">💌</div>
+            <h1>嗨，<span id="targetName">小可爱</span>！</h1>
+            <div class="subtitle">有些心里话，我想认真告诉你...</div>
+            
+            <div class="photo-wall">
+                <div class="photo">💕</div>
+                <div class="photo">✨</div>
+                <div class="photo">🌹</div>
+                <div class="photo">🎀</div>
+            </div>
+
+            <div class="message" id="typedText">
+                <p>从遇见你的那一刻起</p>
+                <p>我的世界就变得更加明亮</p>
+                <p>你的笑容总会让我不自觉心动</p>
+                <p class="highlight">我喜欢你，做我男朋友好吗？</p>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-yes" onclick="acceptLove()">我愿意 💖</button>
+                <button class="btn btn-no" id="noBtn" type="button">再考虑一下</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功页面 -->
+    <div class="result-page" id="successPage">
+        <canvas class="fireworks" id="fireworks"></canvas>
+        <div class="big-heart">💝</div>
+        <div class="result-text">太好了，心愿成真！</div>
+        <div class="result-sub">
+            从今天开始，我会认真爱你、珍惜你<br>
+            想和你一起走过每一个平凡又闪光的日子<br>
+            <div class="countdown">
+                我们已经在一起<br>
+                <span class="countdown-number" id="timer">0</span> 秒了！
+            </div>
+        </div>
+    </div>
+
+    <!-- 拒绝页面（其实也会变成成功） -->
+    <div class="result-page" id="rejectPage" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="big-heart">😢</div>
+        <div class="result-text">先别急着拒绝嘛...</div>
+        <div class="result-sub">
+            可以给我一次机会吗？<br>
+            我会用行动证明我的真心<br><br>
+            <button class="btn btn-yes" onclick="acceptLove()" style="margin-top: 20px;">那...好吧 💕</button>
+        </div>
+    </div>
+
+    <script>
+        // 配置项（你可以修改这里）
+        const config = {
+            targetName: '小可爱',  // 对方昵称
+            startDate: new Date(), // 开始时间
+            message: `从遇见你的那一刻起，
+我的世界就变得更加明亮。
+你的笑容总会让我不自觉心动，
+我想和你一起看日出日落，
+一起收藏生活里的每个小确幸。
+
+我喜欢你，做我男朋友好吗？`
+        };
+
+        // 初始化
+        window.onload = function() {
+            createHearts();
+            document.getElementById('targetName').textContent = config.targetName;
+            typeWriter();
+            startTimer();
+            bindNoBtnEvasion();
+        };
+
+        // 创建飘落爱心
+        function createHearts() {
+            const container = document.getElementById('hearts');
+            const heartSymbols = ['💕', '💖', '💗', '💓', '💝'];
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                container.appendChild(heart);
+                
+                setTimeout(() => heart.remove(), 10000);
+            }, 300);
+        }
+
+        // 打字机效果
+        function typeWriter() {
+            const element = document.getElementById('typedText');
+            const lines = config.message.split('\n');
+            let lineIndex = 0;
+            let charIndex = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (lineIndex < lines.length) {
+                    if (charIndex < lines[lineIndex].length) {
+                        if (charIndex === 0) {
+                            const p = document.createElement('p');
+                            if (lineIndex === lines.length - 1) p.className = 'highlight';
+                            element.appendChild(p);
+                        }
+                        const paragraphs = element.getElementsByTagName('p');
+                        paragraphs[paragraphs.length - 1].textContent += lines[lineIndex][charIndex];
+                        charIndex++;
+                        setTimeout(type, 50);
+                    } else {
+                        lineIndex++;
+                        charIndex = 0;
+                        setTimeout(type, 300);
+                    }
+                }
+            }
+            type();
+        }
+
+        // 拒绝按钮逃跑
+        function runAway() {
+            const btn = document.getElementById('noBtn');
+            const x = (Math.random() - 0.5) * 200;
+            const y = (Math.random() - 0.5) * 100;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+            
+            // 3秒后复位
+            setTimeout(() => {
+                btn.style.transform = 'translate(0, 0)';
+            }, 3000);
+        }
+
+        // 让拒绝按钮始终无法被点击到：靠近/按下就逃跑，并拦截点击
+        function bindNoBtnEvasion() {
+            const btn = document.getElementById('noBtn');
+
+            btn.addEventListener('mouseenter', runAway);
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                runAway();
+            }, { passive: false });
+            btn.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                runAway();
+            });
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                runAway();
+            });
+        }
+
+        // 接受表白
+        function acceptLove() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('successPage').classList.add('active');
+            startFireworks();
+            playMusic();
+            
+            // 震动反馈（如果支持）
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+        }
+
+        // 拒绝表白（也会引导到接受）
+        function rejectLove() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('rejectPage').classList.add('active');
+        }
+
+        // 烟花效果
+        function startFireworks() {
+            const canvas = document.getElementById('fireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
+
+            function Particle(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 10,
+                    y: (Math.random() - 0.5) * 10
+                };
+                this.alpha = 1;
+                this.friction = 0.98;
+            }
+
+            Particle.prototype.draw = function() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            Particle.prototype.update = function() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            };
+
+            function createFirework() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height / 2;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                for (let i = 0; i < 30; i++) {
+                    particles.push(new Particle(x, y, color));
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((particle, index) => {
+                    if (particle.alpha > 0) {
+                        particle.draw();
+                        particle.update();
+                    } else {
+                        particles.splice(index, 1);
+                    }
+                });
+
+                if (Math.random() < 0.05) createFirework();
+            }
+
+            animate();
+        }
+
+        // 计时器
+        function startTimer() {
+            const startTime = new Date();
+            setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - startTime) / 1000);
+                document.getElementById('timer').textContent = diff;
+            }, 1000);
+        }
+
+        // 音乐控制
+        let musicPlaying = false;
+        function toggleMusic() {
+            const music = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicBtn');
+            
+            if (musicPlaying) {
+                music.pause();
+                btn.classList.remove('rotating');
+                btn.textContent = '🎵';
+            } else {
+                music.play().catch(e => console.log('音乐播放需要用户交互'));
+                btn.classList.add('rotating');
+                btn.textContent = '🎶';
+            }
+            musicPlaying = !musicPlaying;
+        }
+
+        function playMusic() {
+            const music = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicBtn');
+            music.play().catch(e => console.log('自动播放被阻止'));
+            btn.classList.add('rotating');
+            musicPlaying = true;
+        }
+
+        // 防止微信内置浏览器问题
+        document.addEventListener('WeixinJSBridgeReady', function() {
+            const music = document.getElementById('bgMusic');
+            music.play();
+        }, false);
+    </script>
+</body>
+</html>
